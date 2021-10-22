@@ -617,7 +617,6 @@ pub fn rotate_board(b: Board) -> Board {
 /// ／`Coord` に入っている座標が `i32` に収まらないほど巨大であれば panic する。
 #[must_use]
 pub fn distance(a: Coord, b: Coord) -> i32 {
-    use std::convert::TryFrom;
     let [x1, y1] = a;
     let [x2, y2] = b;
 

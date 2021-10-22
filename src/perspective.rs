@@ -61,7 +61,7 @@ pub fn to_relative_board(board: &absolute::Board, p: Perspective) -> relative::B
     for (i, row) in ans.iter_mut().enumerate() {
         for (j, sq) in row.iter_mut().enumerate() {
             if let Some(piece) = board.get(&to_absolute_coord([i, j], p)) {
-                *sq = Some(to_relative_piece(*piece, p))
+                *sq = Some(to_relative_piece(*piece, p));
             }
         }
     }
