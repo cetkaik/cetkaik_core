@@ -10,4 +10,4 @@ license = "MIT"
 
 [dependencies]
 maplit = "1.0.2"
-serde = { version = "1.0.137", features = ["derive"] }
+serde = { version = "1.0.147", features = ["derive"] }
