@@ -5,15 +5,15 @@ use serde::{Deserialize, Serialize};
 /// 視点を固定すると、相対座標表現と絶対座標表現を相互変換することができる。
 #[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, Deserialize, Serialize)]
 pub enum Perspective {
-    /// IA is the lowermost row; 
+    /// IA is the lowermost row;
     /// the player who had occupied the IA row in the beginning of the game has pieces that point upward
-    /// (i.e. you) 
+    /// (i.e. you)
     /// ／IAは一番下の行であり、初期状態でIA行を占有していたプレイヤーは駒が上向き（=あなた）である。
     IaIsDownAndPointsUpward,
 
-    /// IA is the uppermost row; 
+    /// IA is the uppermost row;
     /// the player who had occupied the IA row in the beginning of the game has pieces that point downward
-    /// (i.e. the opponent) 
+    /// (i.e. the opponent)
     /// ／IAは一番上の行であり、初期状態でIA行を占有していたプレイヤーは駒が下向き（=相手）である。
     IaIsUpAndPointsDownward,
 }

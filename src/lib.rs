@@ -1,7 +1,11 @@
 //! Core data types and whatnot for cetkaik, a board game. See <https://sites.google.com/view/cet2kaik/the-standardized-rule-in-english> for more context.
 //! ／机戦（セットカイク）のための基本的なデータ型など。
 #![warn(clippy::pedantic, clippy::nursery, missing_docs)]
-#![allow(clippy::non_ascii_literal, clippy::use_self, clippy::upper_case_acronyms)]
+#![allow(
+    clippy::non_ascii_literal,
+    clippy::use_self,
+    clippy::upper_case_acronyms
+)]
 #[macro_use]
 extern crate maplit;
 /// Denotes the color of a piece／駒の色を表す。
@@ -185,13 +189,15 @@ impl<'de> serde::de::Visitor<'de> for ColorVisitor {
     where
         E: serde::de::Error,
     {
-        match Color::from_str(s) {
-            Ok(c) => Ok(c),
-            Err(_) => Err(serde::de::Error::invalid_value(
-                serde::de::Unexpected::Str(s),
-                &self,
-            )),
-        }
+        Color::from_str(s).map_or_else(
+            |_| {
+                Err(serde::de::Error::invalid_value(
+                    serde::de::Unexpected::Str(s),
+                    &self,
+                ))
+            },
+            |c| Ok(c),
+        )
     }
 }
 
@@ -217,13 +223,15 @@ impl<'de> serde::de::Visitor<'de> for ProfessionVisitor {
     where
         E: serde::de::Error,
     {
-        match Profession::from_str(s) {
-            Ok(c) => Ok(c),
-            Err(_) => Err(serde::de::Error::invalid_value(
-                serde::de::Unexpected::Str(s),
-                &self,
-            )),
-        }
+        Profession::from_str(s).map_or_else(
+            |_| {
+                Err(serde::de::Error::invalid_value(
+                    serde::de::Unexpected::Str(s),
+                    &self,
+                ))
+            },
+            |c| Ok(c),
+        )
     }
 }
 
@@ -249,7 +257,7 @@ macro_rules! cp {
 }
 
 /// A shortcut macro for creating `Profession`.
-/// ／`Profession` を楽に構築するためのマクロ。 
+/// ／`Profession` を楽に構築するためのマクロ。
 #[macro_export]
 macro_rules! prof {
     ('船') => {
@@ -292,7 +300,6 @@ macro_rules! prof {
         Profession::Io
     };
 }
-
 
 /// A shortcut macro for creating `Color`.
 /// ／`Color` を楽に構築するためのマクロ。

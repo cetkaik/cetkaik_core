@@ -143,7 +143,7 @@ fn rotate_piece_or_null(p: Option<Piece>) -> Option<Piece> {
 
 /// Denotes the position of a square by [row, col].
 /// ／マス目の相対座標を [row, col] で表す。
-/// 
+///
 pub type Coord = [usize; 2];
 
 /// Serializes [`Coord`](./type.Coord.html) in JSON-style.
@@ -170,6 +170,7 @@ pub const fn rotate_coord(c: Coord) -> Coord {
 /// Checks if the square is a tam2 nua2 (tam2's water), entry to which is restricted.
 /// ／マスが皇水（たむぬあ）であるかどうかの判定
 #[must_use]
+#[allow(clippy::nonminimal_bool)]
 pub const fn is_water([row, col]: Coord) -> bool {
     (row == 4 && col == 2)
         || (row == 4 && col == 3)
@@ -611,7 +612,7 @@ pub fn rotate_board(b: Board) -> Board {
 /// assert_eq!(3, distance([4,5], [1,2]));
 /// assert_eq!(3, distance([1,2], [4,5]));
 /// ```
-/// 
+///
 /// # Panics
 /// Panics if the `Coord` is so invalid that it does not fit in `i32`.
 /// ／`Coord` に入っている座標が `i32` に収まらないほど巨大であれば panic する。

@@ -411,13 +411,15 @@ impl<'de> serde::de::Visitor<'de> for CoordVisitor {
     where
         E: serde::de::Error,
     {
-        match Coord::from_str(s) {
-            Ok(c) => Ok(c),
-            Err(_) => Err(serde::de::Error::invalid_value(
-                serde::de::Unexpected::Str(s),
-                &self,
-            )),
-        }
+        Coord::from_str(s).map_or_else(
+            |_| {
+                Err(serde::de::Error::invalid_value(
+                    serde::de::Unexpected::Str(s),
+                    &self,
+                ))
+            },
+            |c| Ok(c),
+        )
     }
 }
 
