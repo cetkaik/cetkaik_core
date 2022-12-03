@@ -50,6 +50,39 @@ pub fn distance(a: Coord, b: Coord) -> i32 {
     )
 }
 
+/// Calculates the distance between two points.
+/// The distance is defined as the larger of the difference between either the x or y coordinates.
+/// ／2点間の距離（x座標の差およびy座標の差のうち小さくない方）を計算する。
+///
+/// Examples:
+/// ```
+/// use cetkaik_core::absolute::{same_direction, Coord};
+/// use cetkaik_core::absolute::Row::*;
+/// use cetkaik_core::absolute::Column::*;
+///
+/// assert_eq!(true, same_direction(Coord(IA, Z), Coord(A, Z), Coord(E, Z)));
+/// assert_eq!(false, same_direction(Coord(IA, Z), Coord(A, P), Coord(E, Z)));
+/// assert_eq!(false, same_direction(Coord(O, Z), Coord(A, Z), Coord(IA, Z)));
+/// ```
+#[must_use]
+#[allow(clippy::cast_possible_wrap)]
+pub const fn same_direction(origin: Coord, a: Coord, b: Coord) -> bool {
+    use super::perspective;
+
+    // coordinate-independent, so I can just choose one
+    let origin =
+        perspective::to_relative_coord(origin, perspective::Perspective::IaIsDownAndPointsUpward);
+    let a = perspective::to_relative_coord(a, perspective::Perspective::IaIsDownAndPointsUpward);
+    let b = perspective::to_relative_coord(b, perspective::Perspective::IaIsDownAndPointsUpward);
+
+    let a_u = (a[0] as isize) - (origin[0] as isize);
+    let a_v = (a[1] as isize) - (origin[1] as isize);
+    let b_u = (b[0] as isize) - (origin[0] as isize);
+    let b_v = (b[1] as isize) - (origin[1] as isize);
+
+    (a_u * b_u + a_v * b_v > 0) && (a_u * b_v - a_v * b_u == 0)
+}
+
 impl Piece {
     /// Checks whether the piece is a Tam2.
     /// ／皇であるかどうかの判定
@@ -461,7 +494,7 @@ pub fn parse_coord(coord: &str) -> Option<Coord> {
 /// ／官定で定められた初期配置を与える。
 /// <https://raw.githubusercontent.com/sozysozbot/cerke/master/y1_huap1_summary.pdf> にあるように、
 /// ZIAには黒王、ZAには赤王がある。
-/// 
+///
 /// # Examples
 /// ```
 /// use cetkaik_core::absolute::{yhuap_initial_board, Row, Column, Coord, Piece, Side};
@@ -472,9 +505,9 @@ pub fn parse_coord(coord: &str) -> Option<Coord> {
 ///     yhuap_initial_board().get(&Coord(Row::IA, Column::Z)).unwrap()
 /// )
 /// ```
-/// 
+///
 /// This function is consistent with `relative::yhuap_initial_board_where_black_king_points_upward`:
-/// 
+///
 /// ```
 /// use cetkaik_core::{absolute, relative, perspective};
 /// assert_eq!(perspective::to_absolute_board(
