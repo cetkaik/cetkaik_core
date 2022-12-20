@@ -50,9 +50,8 @@ pub fn distance(a: Coord, b: Coord) -> i32 {
     )
 }
 
-/// Calculates the distance between two points.
-/// The distance is defined as the larger of the difference between either the x or y coordinates.
-/// ／2点間の距離（x座標の差およびy座標の差のうち小さくない方）を計算する。
+/// Checks whether `a` and `b` are in the same direction when measured from `origin`.
+/// ／`origin` から見て `a`と`b`が同じ向きに位置しているかを返す。
 ///
 /// Examples:
 /// ```
