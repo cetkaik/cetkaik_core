@@ -140,6 +140,52 @@ pub const fn is_water(Coord(row, col): Coord) -> bool {
     }
 }
 
+impl crate::IsAbsoluteBoard for Board {
+    fn yhuap_initial() -> Self {
+        yhuap_initial_board()
+    }
+}
+
+impl crate::IsBoard for Board {
+    type PieceWithSide = Piece;
+
+    type Coord = Coord;
+
+    fn peek(&self, c: Self::Coord) -> Option<Self::PieceWithSide> {
+        self.get(&c).copied()
+    }
+
+    fn pop(&mut self, c: Self::Coord) -> Option<Self::PieceWithSide> {
+        self.remove(&c)
+    }
+
+    fn put(&mut self, c: Self::Coord, p: Option<Self::PieceWithSide>) {
+        match p {
+            None => {
+                self.remove(&c);
+            }
+            Some(piece) => {
+                self.insert(c, piece);
+            }
+        }
+    }
+
+    fn assert_empty(&self, c: Self::Coord) {
+        assert!(
+            !self.contains_key(&c),
+            "Expected the square {:?} to be empty, but it was occupied",
+            c
+        );
+    }
+
+    fn assert_occupied(&self, c: Self::Coord) {
+        assert!(
+            self.contains_key(&c),
+            "Expected the square {:?} to be occupied, but it was empty",
+            c
+        );
+    }
+}
 
 use std::collections::HashMap;
 

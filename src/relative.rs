@@ -1,3 +1,5 @@
+use crate::IsBoard;
+
 use super::{Color, Profession};
 
 /// Describes which player it is
@@ -843,5 +845,33 @@ impl PureMove {
                 serialize_coord(second_dest)
             ),
         }
+    }
+}
+
+impl IsBoard for Board {
+    type PieceWithSide = Piece;
+
+    type Coord = Coord;
+
+    fn peek(&self, c: Self::Coord) -> Option<Self::PieceWithSide> {
+        self[c[0]][c[1]]
+    }
+
+    fn pop(&mut self, c: Self::Coord) -> Option<Self::PieceWithSide> {
+        let o = self.peek(c);
+        self[c[0]][c[1]] = None;
+        o
+    }
+
+    fn put(&mut self, c: Self::Coord, p: Option<Self::PieceWithSide>) {
+        self[c[0]][c[1]] = p;
+    }
+
+    fn assert_empty(&self, c: Self::Coord) {
+        assert!(self.peek(c).is_none());
+    }
+
+    fn assert_occupied(&self, c: Self::Coord) {
+        assert!(self.peek(c).is_some());
     }
 }

@@ -246,7 +246,7 @@ impl<'de> serde::de::Deserialize<'de> for Profession {
 
 /// A shortcut macro for creating `ColorAndProf`, which is essentially a tuple of the color and the profession.
 /// ／`ColorAndProf` を楽に構築するためのマクロ。
-/// 
+///
 /// # Example
 /// ```
 /// use cetkaik_core::{cp, color, prof, ColorAndProf, Color, Profession};
@@ -515,5 +515,46 @@ impl TryInto<ColorAndProf> for &str {
             },
             _ => return Err(()),
         })
+    }
+}
+
+/// A trait that signifies that you can use it as a `Board` with an absolute coordinate
+/// ／絶対座標付きの `Board` として扱える型を表すトレイト
+pub trait IsAbsoluteBoard: IsBoard {
+/// The initial arrangement of the official (yhuap) rule
+    fn yhuap_initial() -> Self;
+}
+
+/// A trait that signifies that you can use it as a `Board`
+/// ／`Board` として扱える型を表すトレイト
+pub trait IsBoard {
+    /// A type that represents the piece
+    type PieceWithSide: Copy;
+    /// A type that represents the coordinate
+    type Coord: Copy + std::fmt::Debug;
+    
+    /// peek
+    fn peek(&self, c: Self::Coord) -> Option<Self::PieceWithSide>;
+    /// pop
+    fn pop(&mut self, c: Self::Coord) -> Option<Self::PieceWithSide>;
+    /// put either a piece or a `None`
+    fn put(&mut self, c: Self::Coord, p: Option<Self::PieceWithSide>);
+    /// assert that the square is empty
+    fn assert_empty(&self, c: Self::Coord);
+    /// assert that the square is occupied
+    fn assert_occupied(&self, c: Self::Coord);
+    /// Moves the piece located at `from` to an empty square `to`.
+    /// # Panics
+    /// Should panics if either:
+    /// - `from` is unoccupied
+    /// - `to` is already occupied
+    fn mov(&mut self, from: Self::Coord, to: Self::Coord) {
+        self.pop(from).map_or_else(
+            || panic!("Empty square encountered at {from:?}"),
+            |src_piece| {
+                self.assert_empty(to);
+                self.put(to, Some(src_piece));
+            },
+        );
     }
 }
