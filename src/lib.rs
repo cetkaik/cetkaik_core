@@ -244,12 +244,21 @@ impl<'de> serde::de::Deserialize<'de> for Profession {
     }
 }
 
-/// A shortcut macro for creating `NonTam2Piece`, which is essentially a tuple of the color and the profession.
-/// ／`NonTam2Piece` を楽に構築するためのマクロ。
+/// A shortcut macro for creating `ColorAndProf`, which is essentially a tuple of the color and the profession.
+/// ／`ColorAndProf` を楽に構築するためのマクロ。
+/// 
+/// # Example
+/// ```
+/// use cetkaik_core::{cp, color, prof, ColorAndProf, Color, Profession};
+/// use cetkaik_core::Color::*;
+/// use cetkaik_core::Profession::*;
+/// assert_eq!(cp!('赤', '兵'), ColorAndProf { color: Kok1, prof: Kauk2 });
+/// assert_eq!(cp!('黒', '船'), ColorAndProf { color: Huok2, prof: Nuak1 });
+/// ```
 #[macro_export]
 macro_rules! cp {
     ($c:tt, $p:tt) => {
-        NonTam2Piece {
+        ColorAndProf {
             prof: prof!($p),
             color: color!($c),
         }
