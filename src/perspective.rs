@@ -1,4 +1,4 @@
-use crate::{absolute, relative};
+use crate::{absolute, relative, ColorAndProf};
 use serde::{Deserialize, Serialize};
 /// Defines a perspective, with which you can transform between the absolute and the relative
 /// ／どちらの視点で見ているかを表現する型。
@@ -83,44 +83,24 @@ pub fn to_absolute_field(field: relative::Field, p: Perspective) -> absolute::Fi
             Perspective::IaIsDownAndPointsUpward => hop1zuo1of_upward
                 .iter()
                 .copied()
-                .map(
-                    |relative::NonTam2PieceUpward { color, prof }| absolute::NonTam2Piece {
-                        color,
-                        prof,
-                    },
-                )
+                .map(|relative::NonTam2PieceUpward { color, prof }| ColorAndProf { color, prof })
                 .collect(),
             Perspective::IaIsUpAndPointsDownward => hop1zuo1of_downward
                 .iter()
                 .copied()
-                .map(
-                    |relative::NonTam2PieceDownward { color, prof }| absolute::NonTam2Piece {
-                        color,
-                        prof,
-                    },
-                )
+                .map(|relative::NonTam2PieceDownward { color, prof }| ColorAndProf { color, prof })
                 .collect(),
         },
         a_side_hop1zuo1: match p {
             Perspective::IaIsDownAndPointsUpward => hop1zuo1of_downward
                 .iter()
                 .copied()
-                .map(
-                    |relative::NonTam2PieceDownward { color, prof }| absolute::NonTam2Piece {
-                        color,
-                        prof,
-                    },
-                )
+                .map(|relative::NonTam2PieceDownward { color, prof }| ColorAndProf { color, prof })
                 .collect(),
             Perspective::IaIsUpAndPointsDownward => hop1zuo1of_upward
                 .iter()
                 .copied()
-                .map(
-                    |relative::NonTam2PieceUpward { color, prof }| absolute::NonTam2Piece {
-                        color,
-                        prof,
-                    },
-                )
+                .map(|relative::NonTam2PieceUpward { color, prof }| ColorAndProf { color, prof })
                 .collect(),
         },
     }
@@ -141,15 +121,13 @@ pub fn to_relative_field(field: absolute::Field, p: Perspective) -> relative::Fi
             Perspective::IaIsUpAndPointsDownward => ia_side_hop1zuo1.iter().copied(),
             Perspective::IaIsDownAndPointsUpward => a_side_hop1zuo1.iter().copied(),
         }
-        .map(
-            |absolute::NonTam2Piece { color, prof }| relative::NonTam2PieceDownward { color, prof },
-        )
+        .map(|ColorAndProf { color, prof }| relative::NonTam2PieceDownward { color, prof })
         .collect(),
         hop1zuo1of_upward: match p {
             Perspective::IaIsUpAndPointsDownward => a_side_hop1zuo1.iter().copied(),
             Perspective::IaIsDownAndPointsUpward => ia_side_hop1zuo1.iter().copied(),
         }
-        .map(|absolute::NonTam2Piece { color, prof }| relative::NonTam2PieceUpward { color, prof })
+        .map(|ColorAndProf { color, prof }| relative::NonTam2PieceUpward { color, prof })
         .collect(),
         current_board: to_relative_board(&board, p),
     }

@@ -1,3 +1,5 @@
+use crate::ColorAndProf;
+
 use super::{Color, Profession};
 use serde::{Deserialize, Serialize};
 use std::str::FromStr;
@@ -138,115 +140,6 @@ pub const fn is_water(Coord(row, col): Coord) -> bool {
     }
 }
 
-/// Describes a piece that is not a Tam2, and hence can be taken and be placed in a hop1zuo1.
-/// ／駒のうち、皇以外を表す。これは手駒として存在できる駒でもある。
-#[derive(Copy, Clone, Debug, Eq, PartialEq, Hash, Deserialize, Serialize)]
-pub struct NonTam2Piece {
-    /// color of the piece／駒の色
-    pub color: Color,
-    /// profession of the piece／駒の職種
-    pub prof: Profession,
-}
-
-impl std::fmt::Display for NonTam2Piece {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}{}",
-            super::serialize_color(self.color),
-            super::serialize_prof(self.prof)
-        )
-    }
-}
-use std::convert::TryInto;
-impl TryInto<NonTam2Piece> for &str {
-    type Error = ();
-    fn try_into(self) -> Result<NonTam2Piece, Self::Error> {
-        Ok(match self {
-            "黒兵" => NonTam2Piece {
-                color: Color::Huok2,
-                prof: Profession::Kauk2,
-            },
-            "赤兵" => NonTam2Piece {
-                color: Color::Kok1,
-                prof: Profession::Kauk2,
-            },
-            "黒弓" => NonTam2Piece {
-                color: Color::Huok2,
-                prof: Profession::Gua2,
-            },
-            "黒車" => NonTam2Piece {
-                color: Color::Huok2,
-                prof: Profession::Kaun1,
-            },
-            "黒虎" => NonTam2Piece {
-                color: Color::Huok2,
-                prof: Profession::Dau2,
-            },
-            "黒馬" => NonTam2Piece {
-                color: Color::Huok2,
-                prof: Profession::Maun1,
-            },
-            "黒筆" => NonTam2Piece {
-                color: Color::Huok2,
-                prof: Profession::Kua2,
-            },
-            "黒巫" => NonTam2Piece {
-                color: Color::Huok2,
-                prof: Profession::Tuk2,
-            },
-            "黒将" => NonTam2Piece {
-                color: Color::Huok2,
-                prof: Profession::Uai1,
-            },
-            "赤弓" => NonTam2Piece {
-                color: Color::Kok1,
-                prof: Profession::Gua2,
-            },
-            "赤車" => NonTam2Piece {
-                color: Color::Kok1,
-                prof: Profession::Kaun1,
-            },
-            "赤虎" => NonTam2Piece {
-                color: Color::Kok1,
-                prof: Profession::Dau2,
-            },
-            "赤馬" => NonTam2Piece {
-                color: Color::Kok1,
-                prof: Profession::Maun1,
-            },
-            "赤筆" => NonTam2Piece {
-                color: Color::Kok1,
-                prof: Profession::Kua2,
-            },
-            "赤巫" => NonTam2Piece {
-                color: Color::Kok1,
-                prof: Profession::Tuk2,
-            },
-            "赤将" => NonTam2Piece {
-                color: Color::Kok1,
-                prof: Profession::Uai1,
-            },
-            "黒王" => NonTam2Piece {
-                color: Color::Huok2,
-                prof: Profession::Io,
-            },
-            "赤王" => NonTam2Piece {
-                color: Color::Kok1,
-                prof: Profession::Io,
-            },
-            "黒船" => NonTam2Piece {
-                color: Color::Huok2,
-                prof: Profession::Nuak1,
-            },
-            "赤船" => NonTam2Piece {
-                color: Color::Kok1,
-                prof: Profession::Nuak1,
-            },
-            _ => return Err(()),
-        })
-    }
-}
 
 use std::collections::HashMap;
 
@@ -262,10 +155,10 @@ pub struct Field {
     pub board: Board,
 
     /// hop1zuo1 for the ASide／A側の手駒
-    pub a_side_hop1zuo1: Vec<NonTam2Piece>,
+    pub a_side_hop1zuo1: Vec<ColorAndProf>,
 
     /// hop1zuo1 for the IASide／IA側の手駒
-    pub ia_side_hop1zuo1: Vec<NonTam2Piece>,
+    pub ia_side_hop1zuo1: Vec<ColorAndProf>,
 }
 
 impl Field {
@@ -278,8 +171,8 @@ impl Field {
         side: Side,
     ) {
         match side {
-            Side::ASide => self.a_side_hop1zuo1.push(NonTam2Piece { color, prof }),
-            Side::IASide => self.ia_side_hop1zuo1.push(NonTam2Piece { color, prof }),
+            Side::ASide => self.a_side_hop1zuo1.push(ColorAndProf { color, prof }),
+            Side::IASide => self.ia_side_hop1zuo1.push(ColorAndProf { color, prof }),
         }
     }
 
@@ -298,7 +191,7 @@ impl Field {
                 let index = that
                     .a_side_hop1zuo1
                     .iter()
-                    .position(|x| *x == NonTam2Piece { color, prof })?;
+                    .position(|x| *x == ColorAndProf { color, prof })?;
                 that.a_side_hop1zuo1.remove(index);
                 Some(that)
             }
@@ -307,7 +200,7 @@ impl Field {
                 let index = that
                     .ia_side_hop1zuo1
                     .iter()
-                    .position(|x| *x == NonTam2Piece { color, prof })?;
+                    .position(|x| *x == ColorAndProf { color, prof })?;
                 that.ia_side_hop1zuo1.remove(index);
                 Some(that)
             }

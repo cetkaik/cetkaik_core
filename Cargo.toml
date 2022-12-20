@@ -1,6 +1,6 @@
 [package]
 name = "cetkaik_core"
-version = "0.4.2"
+version = "0.5.0"
 authors = ["jekto_vatimeliju <jekto.vatimeliju@gmail.com>"]
 edition = "2021"
 description = "See https://sites.google.com/view/cet2kaik/the-standardized-rule-in-english for context."
