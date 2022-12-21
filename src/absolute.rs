@@ -244,16 +244,6 @@ impl crate::IsField for Field {
         Ok(new_self)
     }
 
-    fn parachute_nontam(&mut self, p: Self::PieceWithSide, to: Self::Coord) {
-        match p {
-            Piece::Tam2 => panic!("Tried to parachute a Tam2"),
-            Piece::NonTam2Piece { color, prof, side } => {
-                assert!(!self.board.contains_key(&to), "{} is already occupied", serialize_coord(to));
-                self.board.insert(to, Piece::NonTam2Piece { color, prof, side });
-            }
-        }
-    }
-
     fn as_board(&self) -> &Self::Board {
         &self.board
     }
@@ -262,36 +252,51 @@ impl crate::IsField for Field {
         &mut self.board
     }
 
-
     #[must_use]
-    fn find_and_remove_piece_from_hop1zuo1(
+    fn search_from_hop1zuo1_and_parachute_at(
         &self,
         color: Color,
         prof: Profession,
-        side: Side,
+        side: Self::Side,
+        to: Self::Coord,
     ) -> Option<Self> {
         match side {
             Side::ASide => {
-                let mut that = self.clone();
-                let index = that
+                let mut new_self = self.clone();
+                let index = new_self
                     .a_side_hop1zuo1
                     .iter()
                     .position(|x| *x == ColorAndProf { color, prof })?;
-                that.a_side_hop1zuo1.remove(index);
-                Some(that)
+                new_self.a_side_hop1zuo1.remove(index);
+
+                if self.board.contains_key(&to) {
+                    return None;
+                }
+
+                new_self
+                    .board
+                    .insert(to, Piece::NonTam2Piece { color, prof, side });
+
+                Some(new_self)
             }
             Side::IASide => {
-                let mut that = self.clone();
-                let index = that
+                let mut new_self = self.clone();
+                let index = new_self
                     .ia_side_hop1zuo1
                     .iter()
                     .position(|x| *x == ColorAndProf { color, prof })?;
-                that.ia_side_hop1zuo1.remove(index);
-                Some(that)
+                new_self.ia_side_hop1zuo1.remove(index);
+
+                if self.board.contains_key(&to) {
+                    return None;
+                }
+                new_self.board
+                    .insert(to, Piece::NonTam2Piece { color, prof, side });
+
+                Some(new_self)
             }
         }
     }
-
 }
 
 use std::collections::HashMap;
@@ -328,8 +333,7 @@ impl Field {
             Side::IASide => self.ia_side_hop1zuo1.push(ColorAndProf { color, prof }),
         }
     }
-
-    }
+}
 
 /// Describes which player it is
 /// ／どちら側のプレイヤーであるかを指定する。

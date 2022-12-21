@@ -858,11 +858,11 @@ impl IsField for Field {
         whose_turn: Self::Side,
     ) -> Result<Self, &'static str>
     where
-        Self: std::marker::Sized {
+        Self: std::marker::Sized,
+    {
         let mut new_self = self.clone();
-        let src_piece = new_self
-            .current_board[src[0]][src[1]]
-            .ok_or("src does not contain a piece")?;
+        let src_piece =
+            new_self.current_board[src[0]][src[1]].ok_or("src does not contain a piece")?;
 
         let Piece::NonTam2Piece { color: _color, prof: _prof, side } = src_piece 
         else {
@@ -903,16 +903,6 @@ impl IsField for Field {
         Ok(new_self)
     }
 
-    fn parachute_nontam(&mut self, p: Self::PieceWithSide, to: Self::Coord) {
-        match p {
-            Piece::Tam2 => panic!("Tried to parachute a Tam2"),
-            Piece::NonTam2Piece { color, prof, side } => {
-                assert!(self.current_board[to[0]][to[1]].is_none(), "{} is already occupied", serialize_coord(to));
-                self.current_board[to[0]][to[1]]= Some(Piece::NonTam2Piece { color, prof, side });
-            }
-        }
-    }
-
     fn as_board(&self) -> &Self::Board {
         &self.current_board
     }
@@ -921,33 +911,44 @@ impl IsField for Field {
         &mut self.current_board
     }
 
-    /// Remove a specified piece from one's hop1zuo1; if none is found, return `None`.
-    /// ／手駒から指定の駒を削除する。見当たらないなら `None`。
     #[must_use]
-    fn find_and_remove_piece_from_hop1zuo1(
+    fn search_from_hop1zuo1_and_parachute_at(
         &self,
         color: Color,
         prof: Profession,
         side: Side,
+        to: Coord,
     ) -> Option<Self> {
         match side {
             Side::Upward => {
-                let mut that = self.clone();
-                let index = that
+                let mut new_self = self.clone();
+                let index = new_self
                     .hop1zuo1of_upward
                     .iter()
                     .position(|x| *x == NonTam2PieceUpward { color, prof })?;
-                that.hop1zuo1of_upward.remove(index);
-                Some(that)
+                new_self.hop1zuo1of_upward.remove(index);
+
+                if self.current_board[to[0]][to[1]].is_some() {
+                    return None;
+                }
+                new_self.current_board[to[0]][to[1]] =
+                    Some(Piece::NonTam2Piece { color, prof, side });
+                Some(new_self)
             }
             Side::Downward => {
-                let mut that = self.clone();
-                let index = that
+                let mut new_self = self.clone();
+                let index = new_self
                     .hop1zuo1of_downward
                     .iter()
                     .position(|x| *x == NonTam2PieceDownward { color, prof })?;
-                that.hop1zuo1of_downward.remove(index);
-                Some(that)
+                new_self.hop1zuo1of_downward.remove(index);
+
+                if self.current_board[to[0]][to[1]].is_some() {
+                    return None;
+                }
+                new_self.current_board[to[0]][to[1]] =
+                    Some(Piece::NonTam2Piece { color, prof, side });
+                Some(new_self)
             }
         }
     }

@@ -586,19 +586,18 @@ pub trait IsField {
     where
         Self: std::marker::Sized;
 
-    /// Remove a specified piece from one's hop1zuo1; if none is found, return `None`.
-    /// ／手駒から指定の駒を削除する。見当たらないなら `None`。
-    fn find_and_remove_piece_from_hop1zuo1(
+    /// Remove a specified piece from one's hop1zuo1 and place it at `dest`;
+    /// if none is found, or if `dest` is already occupied, return `None`.
+    /// ／手駒から指定の駒を削除し、盤面に置く。指定の駒が手駒に見当たらないか、`dest` が既に埋まっているなら `None`。
+    fn search_from_hop1zuo1_and_parachute_at(
         &self,
         color: Color,
         prof: Profession,
         side: Self::Side,
+        dest: Self::Coord,
     ) -> Option<Self>
     where
         Self: std::marker::Sized;
-
-    /// Parachuting a piece
-    fn parachute_nontam(&mut self, p: Self::PieceWithSide, to: Self::Coord);
 
     /// Immutably borrows the board
     fn as_board(&self) -> &Self::Board;
