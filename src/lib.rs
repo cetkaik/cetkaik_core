@@ -559,6 +559,13 @@ pub trait IsBoard {
     }
 }
 
+/// A trait that signifies that you can use it as a `Field` in absolute coordinates
+/// ／絶対座標で書かれた `Field` として扱える型を表すトレイト
+pub trait IsAbsoluteField: IsField {
+    /// The initial arrangement of the official (yhuap) rule
+    fn yhuap_initial() -> Self;
+}
+
 /// A trait that signifies that you can use it as a `Field`
 /// ／`Field` として扱える型を表すトレイト
 pub trait IsField {

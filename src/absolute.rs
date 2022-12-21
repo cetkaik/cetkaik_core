@@ -1,4 +1,4 @@
-use crate::ColorAndProf;
+use crate::{ColorAndProf};
 
 use super::{Color, Profession};
 use serde::{Deserialize, Serialize};
@@ -766,5 +766,11 @@ impl PureMove {
                 serialize_coord(second_dest)
             ),
         }
+    }
+}
+
+impl crate::IsAbsoluteField for Field {
+    fn yhuap_initial() -> Self {
+        Field { board: yhuap_initial_board(), a_side_hop1zuo1: vec![], ia_side_hop1zuo1: vec![] }
     }
 }
