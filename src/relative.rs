@@ -548,37 +548,6 @@ impl Field {
                 .push(NonTam2PieceDownward { color, prof }),
         }
     }
-
-    /// Remove a specified piece from one's hop1zuo1; if none is found, return `None`.
-    /// ／手駒から指定の駒を削除する。見当たらないなら `None`。
-    #[must_use]
-    pub fn find_and_remove_piece_from_hop1zuo1(
-        &self,
-        color: Color,
-        prof: Profession,
-        side: Side,
-    ) -> Option<Self> {
-        match side {
-            Side::Upward => {
-                let mut that = self.clone();
-                let index = that
-                    .hop1zuo1of_upward
-                    .iter()
-                    .position(|x| *x == NonTam2PieceUpward { color, prof })?;
-                that.hop1zuo1of_upward.remove(index);
-                Some(that)
-            }
-            Side::Downward => {
-                let mut that = self.clone();
-                let index = that
-                    .hop1zuo1of_downward
-                    .iter()
-                    .position(|x| *x == NonTam2PieceDownward { color, prof })?;
-                that.hop1zuo1of_downward.remove(index);
-                Some(that)
-            }
-        }
-    }
 }
 
 /// Rotates a board.
@@ -950,5 +919,36 @@ impl IsField for Field {
 
     fn as_board_mut(&mut self) -> &mut Self::Board {
         &mut self.current_board
+    }
+
+    /// Remove a specified piece from one's hop1zuo1; if none is found, return `None`.
+    /// ／手駒から指定の駒を削除する。見当たらないなら `None`。
+    #[must_use]
+    fn find_and_remove_piece_from_hop1zuo1(
+        &self,
+        color: Color,
+        prof: Profession,
+        side: Side,
+    ) -> Option<Self> {
+        match side {
+            Side::Upward => {
+                let mut that = self.clone();
+                let index = that
+                    .hop1zuo1of_upward
+                    .iter()
+                    .position(|x| *x == NonTam2PieceUpward { color, prof })?;
+                that.hop1zuo1of_upward.remove(index);
+                Some(that)
+            }
+            Side::Downward => {
+                let mut that = self.clone();
+                let index = that
+                    .hop1zuo1of_downward
+                    .iter()
+                    .position(|x| *x == NonTam2PieceDownward { color, prof })?;
+                that.hop1zuo1of_downward.remove(index);
+                Some(that)
+            }
+        }
     }
 }

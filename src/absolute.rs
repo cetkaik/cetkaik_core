@@ -261,6 +261,37 @@ impl crate::IsField for Field {
     fn as_board_mut(&mut self) -> &mut Self::Board {
         &mut self.board
     }
+
+
+    #[must_use]
+    fn find_and_remove_piece_from_hop1zuo1(
+        &self,
+        color: Color,
+        prof: Profession,
+        side: Side,
+    ) -> Option<Self> {
+        match side {
+            Side::ASide => {
+                let mut that = self.clone();
+                let index = that
+                    .a_side_hop1zuo1
+                    .iter()
+                    .position(|x| *x == ColorAndProf { color, prof })?;
+                that.a_side_hop1zuo1.remove(index);
+                Some(that)
+            }
+            Side::IASide => {
+                let mut that = self.clone();
+                let index = that
+                    .ia_side_hop1zuo1
+                    .iter()
+                    .position(|x| *x == ColorAndProf { color, prof })?;
+                that.ia_side_hop1zuo1.remove(index);
+                Some(that)
+            }
+        }
+    }
+
 }
 
 use std::collections::HashMap;
@@ -298,37 +329,7 @@ impl Field {
         }
     }
 
-    /// Remove a specified piece from one's hop1zuo1; if none is found, return `None`.
-    /// ／手駒から指定の駒を削除する。見当たらないなら `None`。
-    #[must_use]
-    pub fn find_and_remove_piece_from_hop1zuo1(
-        &self,
-        color: Color,
-        prof: Profession,
-        side: Side,
-    ) -> Option<Self> {
-        match side {
-            Side::ASide => {
-                let mut that = self.clone();
-                let index = that
-                    .a_side_hop1zuo1
-                    .iter()
-                    .position(|x| *x == ColorAndProf { color, prof })?;
-                that.a_side_hop1zuo1.remove(index);
-                Some(that)
-            }
-            Side::IASide => {
-                let mut that = self.clone();
-                let index = that
-                    .ia_side_hop1zuo1
-                    .iter()
-                    .position(|x| *x == ColorAndProf { color, prof })?;
-                that.ia_side_hop1zuo1.remove(index);
-                Some(that)
-            }
-        }
     }
-}
 
 /// Describes which player it is
 /// ／どちら側のプレイヤーであるかを指定する。

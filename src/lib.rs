@@ -576,13 +576,24 @@ pub trait IsField {
     /// - `from` is unoccupied
     /// - `from` has Tam2
     /// - `to` has Tam2
-    /// - `from` does not belong to `whose_turn` 
+    /// - `from` does not belong to `whose_turn`
     fn move_nontam_piece_from_src_to_dest_while_taking_opponent_piece_if_needed(
         &self,
         from: Self::Coord,
         to: Self::Coord,
         whose_turn: Self::Side,
     ) -> Result<Self, &'static str>
+    where
+        Self: std::marker::Sized;
+
+    /// Remove a specified piece from one's hop1zuo1; if none is found, return `None`.
+    /// ／手駒から指定の駒を削除する。見当たらないなら `None`。
+    fn find_and_remove_piece_from_hop1zuo1(
+        &self,
+        color: Color,
+        prof: Profession,
+        side: Self::Side,
+    ) -> Option<Self>
     where
         Self: std::marker::Sized;
 
