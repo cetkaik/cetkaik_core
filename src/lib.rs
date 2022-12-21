@@ -521,7 +521,7 @@ impl TryInto<ColorAndProf> for &str {
 /// A trait that signifies that you can use it as a `Board` with an absolute coordinate
 /// ／絶対座標付きの `Board` として扱える型を表すトレイト
 pub trait IsAbsoluteBoard: IsBoard {
-/// The initial arrangement of the official (yhuap) rule
+    /// The initial arrangement of the official (yhuap) rule
     fn yhuap_initial() -> Self;
 }
 
@@ -532,7 +532,7 @@ pub trait IsBoard {
     type PieceWithSide: Copy;
     /// A type that represents the coordinate
     type Coord: Copy + std::fmt::Debug;
-    
+
     /// peek
     fn peek(&self, c: Self::Coord) -> Option<Self::PieceWithSide>;
     /// pop
@@ -557,4 +557,42 @@ pub trait IsBoard {
             },
         );
     }
+}
+
+/// A trait that signifies that you can use it as a `Field`
+/// ／`Field` として扱える型を表すトレイト
+pub trait IsField {
+    /// A type that represents the board
+    type Board: IsBoard<PieceWithSide = Self::PieceWithSide, Coord = Self::Coord>;
+    /// A type that represents the coordinate
+    type Coord: Eq + std::fmt::Debug;
+    /// A type that represents the piece
+    type PieceWithSide;
+    /// A type that represents the side
+    type Side;
+
+    /// Moving a piece and taking it if necessary
+    /// # Errors
+    /// - `from` is unoccupied
+    /// - `from` has Tam2
+    /// - `to` has Tam2
+    /// - `from` does not belong to `whose_turn` 
+    fn move_nontam_piece_from_src_to_dest_while_taking_opponent_piece_if_needed(
+        &self,
+        from: Self::Coord,
+        to: Self::Coord,
+        whose_turn: Self::Side,
+    ) -> Result<Self, &'static str>
+    where
+        Self: std::marker::Sized;
+
+    /// Parachuting a piece
+    fn parachute_nontam(&mut self, p: Self::PieceWithSide, to: Self::Coord);
+
+    /// Immutably borrows the board
+    fn as_board(&self) -> &Self::Board;
+
+    /// Mutably borrows the board
+    #[must_use]
+    fn as_board_mut(&mut self) -> &mut Self::Board;
 }

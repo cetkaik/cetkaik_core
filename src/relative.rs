@@ -1,4 +1,4 @@
-use crate::IsBoard;
+use crate::{IsBoard, IsField};
 
 use super::{Color, Profession};
 
@@ -873,5 +873,82 @@ impl IsBoard for Board {
 
     fn assert_occupied(&self, c: Self::Coord) {
         assert!(self.peek(c).is_some());
+    }
+}
+
+impl IsField for Field {
+    type Board = Board;
+    type Coord = Coord;
+    type PieceWithSide = Piece;
+    type Side = Side;
+
+    fn move_nontam_piece_from_src_to_dest_while_taking_opponent_piece_if_needed(
+        &self,
+        src: Self::Coord,
+        dest: Self::Coord,
+        whose_turn: Self::Side,
+    ) -> Result<Self, &'static str>
+    where
+        Self: std::marker::Sized {
+        let mut new_self = self.clone();
+        let src_piece = new_self
+            .current_board[src[0]][src[1]]
+            .ok_or("src does not contain a piece")?;
+
+        let Piece::NonTam2Piece { color: _color, prof: _prof, side } = src_piece 
+        else {
+            return Err("Expected a NonTam2Piece to be present at the src, but found a Tam2")
+        };
+
+        if whose_turn != side {
+            return Err("Found the opponent piece at the src");
+        }
+
+        let maybe_captured_piece = new_self.current_board[dest[0]][dest[1]];
+        new_self.current_board[dest[0]][dest[1]] = Some(src_piece);
+
+        if let Some(captured_piece) = maybe_captured_piece {
+            match captured_piece {
+                Piece::Tam2 => return Err("Tried to capture a Tam2"),
+                Piece::NonTam2Piece {
+                    color: captured_piece_color,
+                    prof: captured_piece_prof,
+                    side: captured_piece_side,
+                } => {
+                    if captured_piece_side == whose_turn {
+                        return Err("Tried to capture an ally");
+                    }
+                    match whose_turn {
+                        Side::Downward => new_self.hop1zuo1of_downward.push(NonTam2PieceDownward {
+                            color: captured_piece_color,
+                            prof: captured_piece_prof,
+                        }),
+                        Side::Upward => new_self.hop1zuo1of_upward.push(NonTam2PieceUpward {
+                            color: captured_piece_color,
+                            prof: captured_piece_prof,
+                        }),
+                    }
+                }
+            }
+        }
+        Ok(new_self)
+    }
+
+    fn parachute_nontam(&mut self, p: Self::PieceWithSide, to: Self::Coord) {
+        match p {
+            Piece::Tam2 => panic!("Tried to parachute a Tam2"),
+            Piece::NonTam2Piece { color, prof, side } => {
+                assert!(self.current_board[to[0]][to[1]].is_none(), "{} is already occupied", serialize_coord(to));
+                self.current_board[to[0]][to[1]]= Some(Piece::NonTam2Piece { color, prof, side });
+            }
+        }
+    }
+
+    fn as_board(&self) -> &Self::Board {
+        &self.current_board
+    }
+
+    fn as_board_mut(&mut self) -> &mut Self::Board {
+        &mut self.current_board
     }
 }

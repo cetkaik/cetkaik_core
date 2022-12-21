@@ -187,6 +187,82 @@ impl crate::IsBoard for Board {
     }
 }
 
+impl crate::IsField for Field {
+    type Board = Board;
+    type Coord = Coord;
+    type PieceWithSide = Piece;
+    type Side = Side;
+
+    fn move_nontam_piece_from_src_to_dest_while_taking_opponent_piece_if_needed(
+        &self,
+        src: Self::Coord,
+        dest: Self::Coord,
+        whose_turn: Self::Side,
+    ) -> Result<Self, &'static str> {
+        let mut new_self = self.clone();
+        let src_piece = new_self
+            .board
+            .remove(&src)
+            .ok_or("src does not contain a piece")?;
+
+        let Piece::NonTam2Piece { color: _color, prof: _prof, side } = src_piece 
+        else {
+            return Err("Expected a NonTam2Piece to be present at the src, but found a Tam2")
+        };
+
+        if whose_turn != side {
+            return Err("Found the opponent piece at the src");
+        }
+
+        let maybe_captured_piece = new_self.board.remove(&dest);
+        new_self.board.insert(dest, src_piece);
+
+        if let Some(captured_piece) = maybe_captured_piece {
+            match captured_piece {
+                Piece::Tam2 => return Err("Tried to capture a Tam2"),
+                Piece::NonTam2Piece {
+                    color: captured_piece_color,
+                    prof: captured_piece_prof,
+                    side: captured_piece_side,
+                } => {
+                    if captured_piece_side == whose_turn {
+                        return Err("Tried to capture an ally");
+                    }
+                    match whose_turn {
+                        Side::IASide => new_self.ia_side_hop1zuo1.push(crate::ColorAndProf {
+                            color: captured_piece_color,
+                            prof: captured_piece_prof,
+                        }),
+                        Side::ASide => new_self.a_side_hop1zuo1.push(crate::ColorAndProf {
+                            color: captured_piece_color,
+                            prof: captured_piece_prof,
+                        }),
+                    }
+                }
+            }
+        }
+        Ok(new_self)
+    }
+
+    fn parachute_nontam(&mut self, p: Self::PieceWithSide, to: Self::Coord) {
+        match p {
+            Piece::Tam2 => panic!("Tried to parachute a Tam2"),
+            Piece::NonTam2Piece { color, prof, side } => {
+                assert!(!self.board.contains_key(&to), "{} is already occupied", serialize_coord(to));
+                self.board.insert(to, Piece::NonTam2Piece { color, prof, side });
+            }
+        }
+    }
+
+    fn as_board(&self) -> &Self::Board {
+        &self.board
+    }
+
+    fn as_board_mut(&mut self) -> &mut Self::Board {
+        &mut self.board
+    }
+}
+
 use std::collections::HashMap;
 
 /// Describes the board, the 9x9 squares, in terms of absolute coordinates.
