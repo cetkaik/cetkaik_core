@@ -1,13 +1,11 @@
 [package]
 name = "cetkaik_core"
-version = "0.5.6"
+version = "0.9.99"
 authors = ["jekto_vatimeliju <jekto.vatimeliju@gmail.com>"]
 edition = "2021"
-description = "See https://sites.google.com/view/cet2kaik/the-standardized-rule-in-english for context."
+description = "DEPRECATED in favor of https://crates.io/crates/cetkaik_fundamental and https://crates.io/crates/cetkaik_naive_representation"
 license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-maplit = "1.0.2"
-serde = { version = "1.0.147", features = ["derive"] }
